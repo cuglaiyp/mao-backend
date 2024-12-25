@@ -10,7 +10,6 @@ import org.pyj.http.handler.IFunctionHandler;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,8 +36,9 @@ public class GameInitController implements IFunctionHandler<Map<String, Object>>
                 .limit(10)
                 .map(entry -> entry.getKey() + ":" + entry.getValue())
                 .collect(Collectors.toList());
+        int bound = InfoManager.xiWords.size() - 1;
         InfoManager.sceneInfo.getPlayer2Xi().putIfAbsent(player,
-                InfoManager.xiWords.get(RandomUtil.randomInt(0, InfoManager.xiWords.size() - 1)));
+                InfoManager.xiWords.get(RandomUtil.randomInt(0, bound < 1 ? 1 : bound)));
         Map gameInfo = new HashMap();
         gameInfo.put("player2Score", leaderboard);
         gameInfo.put("playerScore", InfoManager.gameInfo.getPlayer2Score().get(player));

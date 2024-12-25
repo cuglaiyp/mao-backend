@@ -1,8 +1,6 @@
 package org.example.handler;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -43,18 +41,26 @@ public class WebSocketHandler {
         session.setAttribute("player", player);
         InfoManager.player2Session.put(player, session);
         InfoManager.gameInfo.getPlayer2Score().putIfAbsent(player, 0);
+        System.out.println(player + "连接，total:" + InfoManager.player2Session.size());
     }
 
     @OnClose
     public void onClose(Session session) throws IOException {
+        InfoManager.player2Session.remove(session.getAttribute("player"), session);
+        System.out.println(session.getAttribute("player") + "close，total:" + InfoManager.player2Session.size());
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
+        InfoManager.player2Session.remove(session.getAttribute("player"), session);
+        System.out.println(session.getAttribute("player") + "error，total:" + InfoManager.player2Session.size());
     }
 
     @OnMessage
     public void onMessage(Session session, String message) {
+        if (message.equalsIgnoreCase("ping")) {
+            return;
+        }
         if (Float.compare(InfoManager.gameInfo.getProgress(), 100) == 0
                 && InfoManager.sceneInfo.getStatus() == 1) {
             // 设置状态
@@ -100,7 +106,7 @@ public class WebSocketHandler {
                     System.out.println("write idle");
                     break;
                 case ALL_IDLE:
-                    System.out.println("all idle");
+                    session.close();
                     break;
                 default:
                     break;
@@ -166,7 +172,6 @@ public class WebSocketHandler {
             executor.execute(() -> session.sendText(JSON.toJSONString(msg)));
         }
     }
-
 
 
 }

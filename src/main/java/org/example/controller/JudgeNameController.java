@@ -1,8 +1,6 @@
 package org.example.controller;
 
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.RandomUtil;
-import org.example.manager.InfoManager;
 import org.pyj.http.NettyHttpRequest;
 import org.pyj.http.annotation.NettyHttpHandler;
 import org.pyj.http.handler.IFunctionHandler;
@@ -10,7 +8,6 @@ import org.pyj.http.handler.IFunctionHandler;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.example.manager.InfoManager.sceneInfo;
@@ -36,8 +33,6 @@ public class JudgeNameController implements IFunctionHandler<Map> {
         }
         uuid = IdUtil.fastSimpleUUID();
         player2Cookie.put(player, uuid);
-        InfoManager.sceneInfo.getPlayer2Xi().putIfAbsent(player,
-                InfoManager.xiWords.get(RandomUtil.randomInt(0, InfoManager.xiWords.size() - 1)));
         res.put("code", 0);
         res.put("uuid", uuid);
         return res;
