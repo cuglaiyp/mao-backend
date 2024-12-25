@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 public class WebSocketHandler {
 
     private static ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor() {{
-        setCorePoolSize(20); // 核心线程数
-        setMaxPoolSize(40);  // 最大线程数
-        setQueueCapacity(500); // 队列容量
+        setCorePoolSize(4); // 核心线程数
+        setMaxPoolSize(8);  // 最大线程数
+        setQueueCapacity(5000); // 队列容量
         setThreadNamePrefix("broader-"); // 线程名前缀
         initialize(); // 初始化线程池
     }};
@@ -41,19 +41,19 @@ public class WebSocketHandler {
         session.setAttribute("player", player);
         InfoManager.player2Session.put(player, session);
         InfoManager.gameInfo.getPlayer2Score().putIfAbsent(player, 0);
-        System.out.println(player + "连接，total:" + InfoManager.player2Session.size());
+        //System.out.println(player + "连接，total:" + InfoManager.player2Session.size());
     }
 
     @OnClose
     public void onClose(Session session) throws IOException {
-        InfoManager.player2Session.remove(session.getAttribute("player"), session);
-        System.out.println(session.getAttribute("player") + "close，total:" + InfoManager.player2Session.size());
+        InfoManager.player2Session.remove(session.getAttribute("player"));
+        //System.out.println(session.getAttribute("player") + "close，total:" + InfoManager.player2Session.size());
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        InfoManager.player2Session.remove(session.getAttribute("player"), session);
-        System.out.println(session.getAttribute("player") + "error，total:" + InfoManager.player2Session.size());
+        InfoManager.player2Session.remove(session.getAttribute("player"));
+        //System.out.println(session.getAttribute("player") + "error，total:" + InfoManager.player2Session.size());
     }
 
     @OnMessage
@@ -61,8 +61,10 @@ public class WebSocketHandler {
         if (message.equalsIgnoreCase("ping")) {
             return;
         }
-        if (Float.compare(InfoManager.gameInfo.getProgress(), 100) == 0
-                && InfoManager.sceneInfo.getStatus() == 1) {
+        if (InfoManager.sceneInfo.getStatus() != 1) {
+            return;
+        }
+        if (Float.compare(InfoManager.gameInfo.getProgress(), 100) == 0) {
             // 设置状态
             InfoManager.sceneInfo.setStatus(2);
             // 生成喜气卡话术
