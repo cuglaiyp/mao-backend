@@ -11,10 +11,11 @@ public class UpdateXiWordsController implements IFunctionHandler<Void> {
 
     @Override
     public Void execute(NettyHttpRequest request) {
+        return null;
         // 获取请求体，待改框架源码
         //转成Json
-        JSONArray newXiWords = new JSONArray();
-        InfoManager.xiWords = newXiWords.toJavaList(String.class);
-        return null;
+        //JSONArray newXiWords = new JSONArray();
+        //InfoManager.xiWords.addAll(newXiWords.toJavaList(String.class));
+        //return null;
     }
 }
