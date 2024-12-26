@@ -25,7 +25,6 @@ public class GameStartController implements IFunctionHandler<Map<String, Object>
     public void start() {
         if (sceneInfo.getTotalPointCnt() == 0) {
             sceneInfo.setStatus(1);
-            sceneInfo.setStartTimestamp(System.currentTimeMillis() + 4000);
             WebSocketHandler.broadcastSceneMessage();
             log.info("游戏开始成功");
         }

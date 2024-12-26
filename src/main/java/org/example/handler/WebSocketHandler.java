@@ -15,6 +15,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -83,8 +84,9 @@ public class WebSocketHandler {
             log.info("广播游戏停止状态");
             broadcastSceneMessage();
             // 保存结果
-            FileUtil.writeString(JSON.toJSONString(InfoManager.gameInfo), "/var/springboot/data/gameInfo.json", StandardCharsets.UTF_8);
-            FileUtil.writeString(JSON.toJSONString(InfoManager.sceneInfo), "/var/springboot/data/sceneInfo.json", StandardCharsets.UTF_8);
+            String time = LocalDateTime.now().toString();
+            FileUtil.writeString(JSON.toJSONString(InfoManager.gameInfo), "/var/springboot/data/gameInfo-" + time + ".json", StandardCharsets.UTF_8);
+            FileUtil.writeString(JSON.toJSONString(InfoManager.sceneInfo), "/var/springboot/data/sceneInfo" + time + ".json", StandardCharsets.UTF_8);
 //            FileUtil.writeString(JSON.toJSONString(InfoManager.gameInfo), "gameInfo.json", StandardCharsets.UTF_8);
 //            FileUtil.writeString(JSON.toJSONString(InfoManager.sceneInfo), "sceneInfo.json", StandardCharsets.UTF_8);
             return;
@@ -130,12 +132,16 @@ public class WebSocketHandler {
         }
     }
 
-    public static void broadcastGameMessage() {
-        String leaderboard = InfoManager.gameInfo.getPlayer2Score().entrySet().stream()
+    public static String generate10LeaderBoardStr() {
+        return InfoManager.gameInfo.getPlayer2Score().entrySet().stream()
                 .sorted((entry1, entry2) -> Integer.compare(entry2.getValue(), entry1.getValue())) // 按分数降序排序
                 .limit(10)
-                .map(entry -> entry.getKey() + ":" + entry.getValue() + "次")
-                .collect(Collectors.joining("<br>"));
+                .map(entry -> entry.getKey() + ":" + entry.getValue())
+                .collect(Collectors.joining(";"));
+    }
+
+    public static void broadcastGameMessage() {
+        String leaderboard = generate10LeaderBoardStr();
         Iterator<Map.Entry<String, Session>> iterator = InfoManager.player2Session.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, Session> next = iterator.next();
@@ -169,7 +175,6 @@ public class WebSocketHandler {
             String msg = "{" +
                     "\"type\":" + 1 +
                     ",\"status\":" + InfoManager.sceneInfo.getStatus() +
-                    ",\"startTimestamp\":" + InfoManager.sceneInfo.getStartTimestamp() +
                     ",\"xiCardWord\":" + "\"" + InfoManager.sceneInfo.getPlayer2Xi().get(player) + "\"" +
                     ",\"isValid\":" + InfoManager.sceneInfo.getPlayer2Token().containsKey(player) +
                     "}";

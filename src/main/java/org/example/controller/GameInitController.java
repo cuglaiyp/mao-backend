@@ -2,6 +2,7 @@ package org.example.controller;
 
 
 import cn.hutool.core.util.RandomUtil;
+import org.example.handler.WebSocketHandler;
 import org.example.manager.InfoManager;
 import org.pyj.http.NettyHttpRequest;
 import org.pyj.http.annotation.NettyHttpHandler;
@@ -33,11 +34,7 @@ public class GameInitController implements IFunctionHandler<Map<String, Object>>
 
     public Map<String, Object> init(String player) {
         Map<String, Object> res = new HashMap<>();
-        String leaderboard = InfoManager.gameInfo.getPlayer2Score().entrySet().stream()
-                .sorted((entry1, entry2) -> Integer.compare(entry2.getValue(), entry1.getValue())) // 按分数降序排序
-                .limit(10)
-                .map(entry -> entry.getKey() + ":" + entry.getValue() + "次")
-                .collect(Collectors.joining("<br>"));
+        String leaderboard = WebSocketHandler.generate10LeaderBoardStr();
         int bound = InfoManager.xiWords.size() - 1;
         InfoManager.sceneInfo.getPlayer2Xi().putIfAbsent(player,
                 InfoManager.xiWords.get(RandomUtil.randomInt(0, Math.max(bound, 1))));
@@ -47,7 +44,6 @@ public class GameInitController implements IFunctionHandler<Map<String, Object>>
         gameInfo.put("progress", InfoManager.gameInfo.getProgress());
         Map sceneInfo = new HashMap();
         sceneInfo.put("status", InfoManager.sceneInfo.getStatus());
-        sceneInfo.put("startTimestamp", InfoManager.sceneInfo.getStartTimestamp());
         sceneInfo.put("onlineCnt", InfoManager.player2Session.size());
         sceneInfo.put("xiCardWord", InfoManager.sceneInfo.getPlayer2Xi().get(player));
         sceneInfo.put("isValid", InfoManager.sceneInfo.getPlayer2Token().containsKey(player));
