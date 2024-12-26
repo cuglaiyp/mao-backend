@@ -22,7 +22,7 @@
 
     <!-- 根日志级别和输出 -->
     <root level="info">
-        <appender-ref ref="STDOUT" />
+<!--        <appender-ref ref="STDOUT" />-->
         <appender-ref ref="FILE" />
     </root>
 </configuration>
