@@ -17,7 +17,7 @@ public class InfoManager {
 
     static {
         xiWords.add("鸿运当头");
-        xiWords.add("事事如意");
+        xiWords.add("事事顺心");
         xiWords.add("好运连连<br>笑口常开");
         xiWords.add("平安喜乐");
         xiWords.add("吃嘛嘛香<br>身体倍棒");
@@ -27,6 +27,7 @@ public class InfoManager {
         xiWords.add("心想事成<br>步步高升");
         xiWords.add("顺遂无虞<br>皆得所愿");
         xiWords.add("年长乐<br>岁无忧");
+        xiWords.add("财运亨通");
     }
 
     public static float getProgress() {
