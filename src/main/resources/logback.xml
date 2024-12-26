@@ -11,7 +11,7 @@
         <file>/var/springboot/logs/app.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天滚动，日志文件命名格式 -->
-            <fileNamePattern>logs/app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <fileNamePattern>/var/springboot/logs/app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
             <!-- 保留30天的日志文件 -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>

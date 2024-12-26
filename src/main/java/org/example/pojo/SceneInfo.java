@@ -14,14 +14,18 @@ public class SceneInfo {
     private int status = 0;
     private long startTimestamp = 0;
     private int onlineCnt = 0;
-    ConcurrentHashMap<String, String> player2Cookie = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, String> player2Token = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, String> player2Xi = new ConcurrentHashMap<>();
     private int totalPointCnt = 0;
 
     public void reset() {
         this.status = 0;
-        player2Cookie.clear();
         player2Xi.clear();
         this.totalPointCnt = 0;
     }
+    public void toIndex() {
+        reset();
+        player2Token.clear();
+    }
+
 }

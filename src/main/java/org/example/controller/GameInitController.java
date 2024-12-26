@@ -50,6 +50,7 @@ public class GameInitController implements IFunctionHandler<Map<String, Object>>
         sceneInfo.put("startTimestamp", InfoManager.sceneInfo.getStartTimestamp());
         sceneInfo.put("onlineCnt", InfoManager.player2Session.size());
         sceneInfo.put("xiCardWord", InfoManager.sceneInfo.getPlayer2Xi().get(player));
+        sceneInfo.put("isValid", InfoManager.sceneInfo.getPlayer2Token().containsKey(player));
         res.put("gameInfo", gameInfo);
         res.put("sceneInfo", sceneInfo);
         log.info("{} 游戏初始化成功", player);

@@ -85,6 +85,8 @@ public class WebSocketHandler {
             // 保存结果
             FileUtil.writeString(JSON.toJSONString(InfoManager.gameInfo), "/var/springboot/data/gameInfo.json", StandardCharsets.UTF_8);
             FileUtil.writeString(JSON.toJSONString(InfoManager.sceneInfo), "/var/springboot/data/sceneInfo.json", StandardCharsets.UTF_8);
+//            FileUtil.writeString(JSON.toJSONString(InfoManager.gameInfo), "gameInfo.json", StandardCharsets.UTF_8);
+//            FileUtil.writeString(JSON.toJSONString(InfoManager.sceneInfo), "sceneInfo.json", StandardCharsets.UTF_8);
             return;
         }
         String player = message;
@@ -169,6 +171,7 @@ public class WebSocketHandler {
                     ",\"status\":" + InfoManager.sceneInfo.getStatus() +
                     ",\"startTimestamp\":" + InfoManager.sceneInfo.getStartTimestamp() +
                     ",\"xiCardWord\":" + "\"" + InfoManager.sceneInfo.getPlayer2Xi().get(player) + "\"" +
+                    ",\"isValid\":" + InfoManager.sceneInfo.getPlayer2Token().containsKey(player) +
                     "}";
             executor.execute(() -> session.sendText(msg));
         }
@@ -189,6 +192,28 @@ public class WebSocketHandler {
                     ",\"onlineCnt\":" + InfoManager.player2Session.size() +
                     "}";
             executor.execute(() -> session.sendText(msg));
+        }
+    }
+
+    public static void broadcastToIndexMessage() {
+        Iterator<Map.Entry<String, Session>> iterator = InfoManager.player2Session.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Session> next = iterator.next();
+            String player = next.getKey();
+            Session session = next.getValue();
+            if (!session.isActive()) {
+                iterator.remove();
+                continue;
+            }
+            String msg = "{" +
+                    "\"type\":" + 1 +
+                    ",\"status\":" + InfoManager.sceneInfo.getStatus() +
+                    ",\"isValid\":" + InfoManager.sceneInfo.getPlayer2Token().contains(player) +
+                    "}";
+            executor.execute(() -> {
+                session.sendText(msg);
+                session.close();
+            });
         }
     }
 

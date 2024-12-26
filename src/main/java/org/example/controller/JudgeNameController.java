@@ -25,14 +25,14 @@ public class JudgeNameController implements IFunctionHandler<Map> {
             return res;
         }
         String uuid = request.headers().get("uuid");
-        ConcurrentHashMap<String, String> player2Cookie = sceneInfo.getPlayer2Cookie();
-        if (player2Cookie.containsKey(player) && !player2Cookie.get(player).equals(uuid)) {
+        ConcurrentHashMap<String, String> player2Token = sceneInfo.getPlayer2Token();
+        if (player2Token.containsKey(player) && !player2Token.get(player).equals(uuid)) {
             res.put("msg", "名称已存在！");
             res.put("code", 1);
             return res;
         }
         uuid = IdUtil.fastSimpleUUID();
-        player2Cookie.put(player, uuid);
+        player2Token.put(player, uuid);
         res.put("code", 0);
         res.put("uuid", uuid);
         return res;

@@ -17,4 +17,8 @@ public class GameInfo {
         progress = 0;
         player2Score.clear();
     }
+
+    public void toIndex() {
+        reset();
+    }
 }
