@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSON;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.example.manager.InfoManager;
+import org.example.pojo.GameInfo;
 import org.pyj.yeauty.annotation.*;
 import org.pyj.yeauty.pojo.Session;
 import org.slf4j.Logger;
@@ -91,11 +92,27 @@ public class WebSocketHandler {
 //            FileUtil.writeString(JSON.toJSONString(InfoManager.sceneInfo), "sceneInfo.json", StandardCharsets.UTF_8);
             return;
         }
+        char fir = message.charAt(0);
         String player = message;
-        InfoManager.sceneInfo.setTotalPointCnt(InfoManager.sceneInfo.getTotalPointCnt() + 1);
+        Integer cnt = 1;
+        if ('0' <= fir && fir <= '9') {
+            player = message.substring(1);
+            cnt = fir - '0';
+        }
+        InfoManager.sceneInfo.setTotalPointCnt(InfoManager.sceneInfo.getTotalPointCnt() + cnt);
         ConcurrentHashMap<String, Integer> player2Score = InfoManager.gameInfo.getPlayer2Score();
-        player2Score.put(player, player2Score.getOrDefault(player, 0) + 1);
+        player2Score.put(player, player2Score.getOrDefault(player, 0) + cnt);
         InfoManager.gameInfo.setProgress(InfoManager.getProgress());
+        if (InfoManager.gameInfo.getProgress() >= 30.0 && InfoManager.sceneInfo.getShow40Bonus() == 0) {
+            InfoManager.sceneInfo.setShow40Bonus(1);
+            broadcastBonusMessage();
+            InfoManager.sceneInfo.setShow40Bonus(2);
+        }
+        if (InfoManager.gameInfo.getProgress() >= 70.0 && InfoManager.sceneInfo.getShow80Bonus() == 0 && InfoManager.sceneInfo.getShow40Bonus() == 2) {
+            InfoManager.sceneInfo.setShow80Bonus(1);
+            broadcastBonusMessage();
+            InfoManager.sceneInfo.setShow80Bonus(2);
+        }
     }
 
     private void generateXiWord() {
@@ -177,6 +194,25 @@ public class WebSocketHandler {
                     ",\"status\":" + InfoManager.sceneInfo.getStatus() +
                     ",\"xiCardWord\":" + "\"" + InfoManager.sceneInfo.getPlayer2Xi().get(player) + "\"" +
                     ",\"isValid\":" + InfoManager.sceneInfo.getPlayer2Token().containsKey(player) +
+                    "}";
+            executor.execute(() -> session.sendText(msg));
+        }
+    }
+
+    public static void broadcastBonusMessage() {
+        Iterator<Map.Entry<String, Session>> iterator = InfoManager.player2Session.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Session> next = iterator.next();
+            String player = next.getKey();
+            Session session = next.getValue();
+            if (!session.isActive()) {
+                iterator.remove();
+                continue;
+            }
+            String msg = "{" +
+                    "\"type\":" + 3 +
+                    ",\"status\":" + InfoManager.sceneInfo.getStatus() +
+                    ",\"bonus\":" + (InfoManager.sceneInfo.getShow40Bonus() == 1 || InfoManager.sceneInfo.getShow80Bonus() == 1) +
                     "}";
             executor.execute(() -> session.sendText(msg));
         }
